@@ -3554,8 +3554,8 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     }
 
     // Updating these every step keeps it more accurate.
-    // playerPreviewDirty = true;
-    // opponentPreviewDirty = true;
+    playerPreviewDirty = true;
+    opponentPreviewDirty = true;
 
     return true;
   }
@@ -3601,6 +3601,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         var oldStepTime:Float = Conductor.instance.currentStepTime;
         var oldSongPosition:Float = Conductor.instance.songPosition + Conductor.instance.instrumentalOffset;
         updateSongTime();
+        handleBuddies(oldSongPosition, Conductor.instance.songPosition + Conductor.instance.instrumentalOffset);
         handleHitsounds(oldSongPosition, Conductor.instance.songPosition + Conductor.instance.instrumentalOffset);
         // Resync vocals.
         if (Math.abs(audioInstTrack.time - audioVocalTrackGroup.time) > 100)
@@ -3619,6 +3620,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         // Else, move the entire view.
         var oldSongPosition:Float = Conductor.instance.songPosition + Conductor.instance.instrumentalOffset;
         updateSongTime();
+        handleBuddies(oldSongPosition, Conductor.instance.songPosition + Conductor.instance.instrumentalOffset);
         handleHitsounds(oldSongPosition, Conductor.instance.songPosition + Conductor.instance.instrumentalOffset);
         // Resync vocals.
         if (Math.abs(audioInstTrack.time - audioVocalTrackGroup.time) > 100)
@@ -5309,8 +5311,8 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
   function handleToolboxes():Void
   {
     handleDifficultyToolbox();
-    // handlePlayerPreviewToolbox();
-    // handleOpponentPreviewToolbox();
+    handlePlayerPreviewToolbox();
+    handleOpponentPreviewToolbox();
   }
 
   function handleDifficultyToolbox():Void
@@ -5337,7 +5339,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     if (charPreviewToolbox == null) return;
 
     // TODO: Re-enable the player preview once we figure out the performance issues.
-    var charPlayer:Null<CharacterPlayer> = null; // charPreviewToolbox.findComponent('charPlayer');
+    var charPlayer:Null<CharacterPlayer> = charPreviewToolbox.findComponent('charPlayer');
     if (charPlayer == null) return;
 
     currentPlayerCharacterPlayer = charPlayer;
@@ -5376,7 +5378,7 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
     if (charPreviewToolbox == null) return;
 
     // TODO: Re-enable the player preview once we figure out the performance issues.
-    var charPlayer:Null<CharacterPlayer> = null; // charPreviewToolbox.findComponent('charPlayer');
+    var charPlayer:Null<CharacterPlayer> = charPreviewToolbox.findComponent('charPlayer');
     if (charPlayer == null) return;
 
     currentOpponentCharacterPlayer = charPlayer;
@@ -5405,6 +5407,52 @@ class ChartEditorState extends UIState // UIState derives from MusicBeatState
         charPreviewToolbox.width = charPlayer.width + 32;
         charPreviewToolbox.height = charPlayer.height + 64;
       }
+    }
+  }
+
+  /**
+   * Handle the playback of the buddies.
+   */
+  function handleBuddies(oldSongPosition:Float, newSongPosition:Float):Void
+  {
+    // Assume notes are sorted by time.
+    for (noteData in currentSongChartNoteData)
+    {
+      // Check for notes between the old and new song positions.
+
+      if (noteData.time < oldSongPosition) // Note is in the past.
+        continue;
+
+      if (noteData.time > newSongPosition) // Note is in the future.
+        break; // Assume all notes are also in the future.
+
+      // Note was just hit.
+
+      // Character preview.
+
+      // NoteScriptEvent takes a sprite, ehe. Need to rework that.
+      var tempNote:NoteSprite = new NoteSprite(NoteStyleRegistry.instance.fetchDefault());
+      tempNote.noteData = noteData;
+      tempNote.scrollFactor.set(0, 0);
+      var event:NoteScriptEvent = new HitNoteScriptEvent(tempNote, 0.0, 0, 'perfect', false, 0);
+      dispatchEvent(event);
+    }
+
+    var events = SongDataUtils.getEventsInTimeRange(currentSongChartEventData, oldSongPosition, newSongPosition);
+    var eventsAtPos = SongDataUtils.getEventsWithKind(events, ['PlayAnimation']);
+
+    for (eventData in eventsAtPos)
+    {
+      var target:Null<CharacterPlayer> = null;
+      switch (eventData.getString('target'))
+      {
+        case 'boyfriend' | 'bf' | 'player':
+          target = currentPlayerCharacterPlayer ?? null;
+        case 'dad' | 'opponent':
+          target = currentOpponentCharacterPlayer ?? null;
+        default: // Continue
+      }
+      if (target != null) target.playAnimation(eventData.getString('anim'), eventData.getBool('force') ?? false);
     }
   }
 

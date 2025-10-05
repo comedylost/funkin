@@ -8,6 +8,7 @@ import funkin.modding.events.ScriptEvent.SongTimeScriptEvent;
 import funkin.modding.events.ScriptEvent.UpdateScriptEvent;
 import funkin.play.character.BaseCharacter;
 import funkin.data.character.CharacterData.CharacterDataParser;
+import funkin.play.notes.NoteDirection;
 import haxe.ui.containers.Box;
 import haxe.ui.core.Component;
 import haxe.ui.events.AnimationEvent;
@@ -121,6 +122,11 @@ class CharacterPlayer extends Box
     }
   }
 
+  public function playAnimation(name:String, restart:Bool = false, ignoreOther:Bool = false, reversed:Bool = false):Void 
+  {
+    if (character != null) character.playAnimation(name, restart, ignoreOther, reversed);
+  }
+
   /**
    * The character type (such as BF, Dad, GF, etc).
    */
@@ -179,8 +185,8 @@ class CharacterPlayer extends Box
     // Apply animation offsets, so the character is positioned correctly based on the animation.
     @:privateAccess var animOffsets:Array<Float> = character.animOffsets;
 
-    character.x -= animOffsets[0] * targetScale * (flip ? -1 : 1);
-    character.y -= animOffsets[1] * targetScale;
+    //character.x -= animOffsets[0] * targetScale * (flip ? -1 : 1);
+    //character.y -= animOffsets[1] * targetScale;
   }
 
   /**
