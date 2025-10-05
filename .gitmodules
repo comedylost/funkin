@@ -1,6 +1,7 @@
 [submodule "assets"]
 	path = assets
 	url = https://github.com/ComedyLost/funkin.assets/
+	branch = chart-pals
 [submodule "art"]
 	path = art
 	url = https://github.com/FunkinCrew/Funkin.art
