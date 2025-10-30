@@ -1,6 +1,7 @@
 package funkin.util;
 
 import Type.ValueType;
+import polymod.hscript._internal.PolymodScriptClass;
 
 /**
  * Provides sanitized and blacklisted access to haxe's Reflection functions.
@@ -316,13 +317,20 @@ class ReflectUtil
   }
 
   /**
-   * This function is not allowed to be used by scripts.
-   * @throws error When called by a script.
+   * Resolve a class by name
+   * @param name The class name to resolve
+   * @throws error When trying to resolve a blacklisted class.
+   * @return Resolved class
    */
-  @SuppressWarnings("checkstyle:FieldDocComment")
   public static function resolveClass(name:String):Class<Any>
   {
-    throw "Function Type.resolveClass is blacklisted.";
+    var className = name;
+    if (PolymodScriptClass.importOverrides.exists(className)) {
+      if (PolymodScriptClass.importOverrides.get(className) == null) throw 'Class $className is blacklisted.';
+      var cls = cast PolymodScriptClass.importOverrides.get(className);
+      className = Type.getClassName(cls);
+    }
+    return Type.resolveClass(className);
   }
 
   /**
