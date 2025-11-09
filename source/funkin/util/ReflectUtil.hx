@@ -325,7 +325,8 @@ class ReflectUtil
   public static function resolveClass(name:String):Class<Any>
   {
     var className = name;
-    if (PolymodScriptClass.importOverrides.exists(className)) {
+    if (PolymodScriptClass.importOverrides.exists(className))
+    {
       if (PolymodScriptClass.importOverrides.get(className) == null) throw 'Class $className is blacklisted.';
       var cls = cast PolymodScriptClass.importOverrides.get(className);
       className = Type.getClassName(cls);
