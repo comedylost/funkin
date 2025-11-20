@@ -256,6 +256,9 @@ class PolymodHandler
     // NOTE: Scripted classes are automatically aliased to their parent class.
     Polymod.addImportAlias('flixel.math.FlxPoint', flixel.math.FlxPoint.FlxBasePoint);
 
+    // flixel.util.FlxSave has a `resolveFlixelClasses` function
+    Polymod.addImportAlias('flixel.util.FlxSave', funkin.save.FlxSaveSandboxed);
+  
     Polymod.addImportAlias('funkin.data.event.SongEventSchema', funkin.data.event.SongEventSchema.SongEventSchemaRaw);
 
     // `lime.utils.Assets` literally just has a private `resolveClass` function for some reason? so we replace it with our own.
@@ -319,10 +322,6 @@ class PolymodHandler
     // `haxe.Unserializer`
     // Unserializer.DEFAULT_RESOLVER.resolveClass() can access blacklisted packages
     Polymod.blacklistImport('haxe.Unserializer');
-
-    // `flixel.util.FlxSave`
-    // FlxSave.resolveFlixelClasses() can access blacklisted packages
-    Polymod.blacklistImport('flixel.util.FlxSave');
 
     // Disable access to AdMob Util
     Polymod.blacklistImport('funkin.mobile.util.AdMobUtil');
