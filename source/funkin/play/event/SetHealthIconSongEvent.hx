@@ -6,7 +6,7 @@ import funkin.data.song.SongData;
 import funkin.data.song.SongData.SongEventData;
 
 /**
- * This class represents a handler for scroll speed events.
+ * This class represents a handler for health icon events.
  *
  * Example: Set the health icon of Boyfriend to "bf-pixel":
  * ```
