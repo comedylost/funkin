@@ -2309,7 +2309,7 @@ class FreeplayState extends MusicBeatSubState
           // Continue playing this music between states, until a different music track gets played.
           persist: true
         });
-        FlxG.sound.music.fadeIn(4.0, 0.0, 1.0);
+        if (FlxG.sound.music != null) FlxG.sound.music.fadeIn(4.0, 0.0, 1.0);
         dispatchEvent(new FreeplayScriptEvent(FREEPLAY_CLOSE));
         close();
       }
