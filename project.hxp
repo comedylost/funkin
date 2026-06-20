@@ -589,7 +589,7 @@ class Project extends HXProject
       buildHxCppTools();
     }
 
-    if (!(isDisplay() || isClean()))
+    if (!(isDisplay() || isCleanCommand()))
     {
       checkLibraries();
     }
@@ -1416,7 +1416,7 @@ class Project extends HXProject
 
   function configureAssets()
   {
-    if (!(isDisplay() || isClean()))
+    if (!(isDisplay() || isCleanCommand()))
     {
       // Delete the assets folder from the export folder before adding anything.
       clearAssets();
@@ -1654,14 +1654,10 @@ class Project extends HXProject
    */
   function configureASTCTextures()
   {
-    if (!(isDisplay() || isClean()))
+    if (!(isDisplay() && isCleanCommand()) && FEATURE_COMPRESSED_TEXTURES.isEnabled(this))
     {
       readASTCExclusion();
-
-      if (FEATURE_COMPRESSED_TEXTURES.isEnabled(this))
-      {
-        runASTCCompressor();
-      }
+      runASTCCompressor();
     }
   }
 
@@ -1802,9 +1798,14 @@ class Project extends HXProject
     return this.command == "display";
   }
 
-  public function isClean():Bool
+  public function isCleanCommand():Bool
   {
     return this.command == "clean";
+  }
+
+  public function isCleanFlag():Bool
+  {
+    return this.targetFlags.exists("clean");
   }
 
   public function isBuild():Bool
@@ -2335,7 +2336,7 @@ class Project extends HXProject
    */
   public function info(message:String):Void
   {
-    if (!(isDisplay() || isClean()))
+    if (!(isDisplay() || isCleanCommand()))
     {
       Sys.println(' INFO '.bold().bg_blue() + " " + message);
     }
@@ -2346,7 +2347,7 @@ class Project extends HXProject
    */
   public function warn(message:String):Void
   {
-    if (!(isDisplay() || isClean()))
+    if (!(isDisplay() || isCleanCommand()))
     {
       Sys.println(' WARNING '.bold().bg_yellow() + " " + message);
     }
